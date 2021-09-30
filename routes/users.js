@@ -1,14 +1,53 @@
 const express = require("express");
+const { serializeUser } = require("passport");
 const router = express.Router();
+const bcrypt = require("bcryptjs");
+
+// Schema
+const User = require("../models/User");
 
 // Login Page
 router.get("/login", (req, res) => {
-  res.send("Login");
+  res.render("login.ejs");
 });
 
 // Register Page
 router.get("/register", (req, res) => {
-  res.send("Register");
+  res.render("register.ejs");
 });
 
+// Register Handle
+router.post("/register", (req, res) => {
+  const { name, email, password, password2 } = req.body;
+
+  let errors = [];
+
+  // check fields
+  if (!name || !email || !password || !password2) {
+    errors.push({ message: "Please fill in all fields." });
+  }
+
+  // compare password
+  if (password !== password2) {
+    errors.push({ message: "Password not matched." });
+  }
+
+  // password length
+  if (password.lenght < 6) {
+    errors.push({ message: "Password should be at least 6 chracters." });
+  }
+
+  if (errors.length > 0) {
+    console.log(errors);
+    res.render("register", { errors, name, email, password, password2 });
+  } else {
+    User.findOne({ email: email }).then((user) => {
+      if (user) {
+        errors.push({ message: "Email is already registered" });
+        res.render("register", { errors, name, email, password, password2 });
+      } else {
+      }
+    });
+  }
+});
 module.exports = router;

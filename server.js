@@ -1,15 +1,23 @@
 const express = require("express");
-var expressLayouts = require("express-ejs-layouts");
 const app = express();
-const index = require("./routes/index");
+const main = require("./routes/index");
 const users = require("./routes/users");
+const mongoose = require("mongoose");
+
+// Connect DB
+mongoose
+  .connect("mongodb://localhost:27017/alpha", { useNewUrlParser: true })
+  .then(() => console.log("MongoDb Connected..."))
+  .catch((err) => console.log(err));
 
 // EJS
 app.set("view engine", "ejs");
-app.use(expressLayouts);
+
+// Body Parser
+app.use(express.urlencoded({ extended: false }));
 
 // Routes
-app.use("/", index);
+app.use("/", main);
 app.use("/users", users);
 
 const PORT = process.env.PORT || 5000;
