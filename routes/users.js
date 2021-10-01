@@ -46,6 +46,29 @@ router.post("/register", (req, res) => {
         errors.push({ message: "Email is already registered" });
         res.render("register", { errors, name, email, password, password2 });
       } else {
+        const user = new User({
+          name,
+          email,
+          password,
+        });
+
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(user.password, salt, (err, hash) => {
+            if (err) throw err;
+            user.password = hash;
+            user
+              .save()
+              .then((user) => {
+                req.flash(
+                  "success_message",
+                  "You are now registered and can login"
+                );
+
+                res.redirect("/users/login");
+              })
+              .catch((err) => console.log(err));
+          });
+        });
       }
     });
   }

@@ -3,6 +3,9 @@ const app = express();
 const main = require("./routes/index");
 const users = require("./routes/users");
 const mongoose = require("mongoose");
+// Flash Message
+const flash = require("connect-flash");
+const session = require("express-session");
 
 // Connect DB
 mongoose
@@ -15,6 +18,25 @@ app.set("view engine", "ejs");
 
 // Body Parser
 app.use(express.urlencoded({ extended: false }));
+
+// Express Session
+app.use(
+  session({
+    secret: "gwccracker",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+// Connect Flash
+app.use(flash());
+
+// Global Vars
+app.use((req, res, next) => {
+  res.locals.success_message = req.flash("success_message");
+  res.locals.error_message = req.flash("error_message");
+  next();
+});
 
 // Routes
 app.use("/", main);
